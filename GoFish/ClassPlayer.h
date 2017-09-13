@@ -3,16 +3,13 @@
  * Author: Leo Huang
  * Student ID: 26886294
  * Date created: 29/8/2017
- */
+*/
 
 #ifndef CLASSPLAYER_H
 #define CLASSPLAYER_H
 
 #include <string>
 #include <vector>
-#include <ctime> //std::srand for seeding
-#include <algorithm> //std::sort
-#include <sstream>
 #include "ClassCard.h"
 
 using namespace std;
@@ -29,16 +26,15 @@ class ClassPlayer
 		void addCard(ClassCard card);
 		ClassCard getCard(int i);
 		ClassCard getRandomCard();
-		stringstream checkSets();
-		stringstream drawCard(ClassPlayer& table);
-		stringstream showHand();
-		bool compareCards(ClassCard& card1, ClassCard& card2);
-		void sortCards(vector<ClassCard>& cardVector);
+		string checkSets();
+		string drawCard(ClassPlayer& table);
+		string showHand();
+		static bool compareCards(ClassCard& card1, ClassCard& card2);
+		void sortCards();
 		int getRandomPlayerToAsk(int selfIndex, int playerCount);
 		int getRandomCardRank();
 		void setName(string name);
 		string getName();
-		string getType();
 		int getPoints();
 		int getCardCount();
 		int getSetsCompleted();

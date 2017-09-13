@@ -3,13 +3,15 @@
  * Author: Leo Huang
  * Student ID: 26886294
  * Date created: 12/9/2017
- */
+*/
 
+#include <iostream>
+#include <ctime> //std::srand for seeding
+#include "conio.h" //_getch
 #include "Game.h"
 #include "ClassPlayer.h"
 #include "ClassCard.h"
-
-using namespace std;
+#include "rankToString.h"
 
 /** Empty constructor */
 Game::Game()
@@ -28,7 +30,7 @@ Game::Game(int playerCount)
 	/** Add the AIs */
 	for (int i = 0; i < playerCount - 1; i++)
 	{
-		string tempName = "AI" + (i + 1);
+		string tempName = "AI" + to_string(i + 1);
 		ClassPlayer tempPlayer = ClassPlayer(tempName);
 		players.push_back(tempPlayer);
 	}
@@ -40,6 +42,7 @@ Game::Game(int playerCount)
 		{
 			players.at(i).addCard(table.getRandomCard());
 		}
+		checkPlayerForSets(players.at(i));
 	}
 }
 
@@ -70,18 +73,24 @@ void Game::turn()
 	bool turnOngoing = true;
 	while (turnOngoing)
 	{
-		int playerToAsk, cardValue;
 		system("cls");
+		cout << "There are currently " << table.getCardCount() << " cards left on the table.\n\n";
+		for (int i = 0; i < playerCount; i++)
+		{
+			cout << players.at(i).getName() << " has " << players.at(i).getCardCount() << " cards and " << players.at(i).getPoints() << " points.\n";
+		}
+		cout << "\nYour current hand:\n" << players.at(0).showHand() << "\n\n";
+		if (players.at(currentPlayer).getCardCount() == 4)
+		{
+			turnOngoing = false;
+			break;
+		}
+		int playerToAsk, cardValue;
 		cout << players.at(currentPlayer).getName() << "'s turn.\n";
+		wait();
 		/** Selecting a player to ask and a card rank to ask for */
 		if (currentPlayer == 0) //if it is our turn
 		{
-			cout << "There are currently " << table.getCardCount() << "left on the table.\n";
-			for (int i = 0; i < playerCount; i++)
-			{
-				cout << "(" << i << ") " << players.at(i).getName() << " has " << players.at(i).getCardCount() << " cards.\n";
-			}
-			cout << "Your current hand:\n" << players.at(0).showHand().rdbuf() << "\n";
 			playerToAsk = getPlayerToAsk();
 			cardValue = getCardRank();
 		}
@@ -90,25 +99,35 @@ void Game::turn()
 			playerToAsk = players.at(currentPlayer).getRandomPlayerToAsk(currentPlayer, playerCount);
 			cardValue = players.at(currentPlayer).getRandomCardRank();
 		}
-		cout << players.at(currentPlayer).getName() << " asks " << players.at(playerToAsk).getName() << " for " << cardValue << "s" << endl;
-		cout << "Press enter to continue.\n";
-		cin.get();
+		cout << players.at(currentPlayer).getName() << " asks " << players.at(playerToAsk).getName() << " for " << rankToString(cardValue) << "s\n";
+		wait();
 		if (players.at(playerToAsk).have(cardValue) > -1) //if they have the card of requested rank
 		{
 			while (players.at(playerToAsk).have(cardValue) > -1) //while they still have the cards of the requested rank
 			{
 				ClassCard card = players.at(playerToAsk).getCard(players.at(playerToAsk).have(cardValue));
 				players.at(currentPlayer).addCard(card); //take the cards
-				cout << players.at(playerToAsk).getName() << " gives " << players.at(currentPlayer).getName() << " a " << card.getRank() << " of " << card.getSuit() << endl;
+				cout << players.at(playerToAsk).getName() << " gives " << players.at(currentPlayer).getName() << " a " << rankToString(card.getRank()) << " of " << card.getSuit() << endl;
+				wait();
 			}
 			checkPlayerForSets(players.at(currentPlayer));
 		}
 		else //draw card (go fish)
 		{
 			cout << players.at(playerToAsk).getName() << " tells " << players.at(currentPlayer).getName() << " to go fish.\n";
+			wait();
 			ClassCard tempCard = table.getRandomCard();
 			players.at(currentPlayer).addCard(tempCard);
-			checkPlayerForSets(players.at(currentPlayer));
+			if (currentPlayer != 0)
+			{
+				cout << players.at(currentPlayer).getName() << " draws a card from the table.\n";
+				wait();
+			}
+			else
+			{
+				cout << "You draw a " << rankToString(tempCard.getRank()) << " of " << tempCard.getSuit() << endl;
+				wait();
+			}
 			if (tempCard.getRank() != cardValue) //if the drawn card isn't what was asked, turn over
 			{
 				turnOngoing = false;
@@ -116,12 +135,19 @@ void Game::turn()
 			}
 			else
 			{
-				cout << players.at(currentPlayer).getName() << " draws a " << tempCard.getRank() << " of " << tempCard.getSuit() << endl;
+				if (currentPlayer != 0)
+				{
+					cout << players.at(currentPlayer).getName() << " draws a " << rankToString(tempCard.getRank()) << " of " << tempCard.getSuit() << endl;
+					wait();
+				}
 			}
+			checkPlayerForSets(players.at(currentPlayer));
 		}
 	}
 	currentPlayer += 1;
 	currentPlayer %= playerCount;
+	cout << "End of turn";
+	wait();
 }
 
 /** Retrieves and returns the name of the player */
@@ -157,9 +183,9 @@ int Game::getPlayerToAsk()
 		cin >> playerToAsk;
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
-		if (playerToAsk > 0 && playerToAsk << playerCount)
+		if (playerToAsk > 0 && playerToAsk < playerCount)
 		{
-			validCommand == true;
+			validCommand = true;
 		}
 		else
 		{
@@ -170,67 +196,61 @@ int Game::getPlayerToAsk()
 }
 
 /** Retrieves an int representing the rank of the card the player would like to ask for */
-int Game::getCardRank()
+char Game::getCardRank()
 {
-	int intRank;
-	char charRank;
+	int rank;
 	bool validCommand = false;
 	while (!validCommand)
 	{
-		cout << "What card would you like to ask for?";
-		cin >> charRank;
+		cout << "What card would you like to ask for? (1 - 13) ";
+		cin >> rank;
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
-		charRank = tolower(charRank);
-		if ((charRank > (char)0 && charRank < (char)10) || charRank == 'j' || charRank == 'q' || charRank == 'k' || charRank == 'a')
-		{
-			switch (charRank)
-			{
-				case 'j':
-				{
-					intRank = 11;
-					break;
-				}
-				case 'q':
-				{
-					intRank = 12;
-					break;
-				}
-				case 'k':
-				{
-					intRank = 13;
-					break;
-				}
-				case 'a':
-				{
-					intRank = 1;
-					break;
-				}
-				default:
-				{
-					intRank = (int)charRank - 48;
-					break;
-				}
-			}
-			if (players.at(0).have(intRank) > -1)
-			{
-				cout << "You cannot ask for a card you do not have.\n";
-			}
-		}
-		else
+		if (rank < 1 || rank > 13)
 		{
 			cout << "Invalid card. Please try again.\n";
 		}
+		else if (players.at(0).have(rank) == -1)
+		{
+			cout << "You cannot ask for a card you do not have.\n";
+		}
+		else
+		{
+			validCommand = true;
+		}
 	}
-	return intRank;
+	return rank;
 }
 
 /** Checks the player for sets then draw if needed */
 void Game::checkPlayerForSets(ClassPlayer& player)
 {
-	cout << players.at(currentPlayer).checkSets() << endl;
-	if (players.at(currentPlayer).getCardCount() == 0)
+	player.sortCards();
+	string temp = player.checkSets();
+	if (!temp.empty())
 	{
-		cout << players.at(currentPlayer).drawCard() << endl;
-	}	checkPlayerForSets(player);
+		cout << temp << endl;
+		wait();
+	}
+	while (player.getCardCount() == 0 && table.getCardCount() > 0)
+	{
+		cout << player.drawCard(table) << endl;
+		wait();
+		player.sortCards();
+		string temp = player.checkSets();
+		if (!temp.empty())
+		{
+			cout << temp << endl;
+			wait();
+		}
+	}
+}
+
+/** Waits for enter to be pressed before resuming the program */
+void Game::wait()
+{
+	while (_getch() != '\r')
+	{
+		//do nothing
+	}
 }

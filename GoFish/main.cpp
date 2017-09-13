@@ -3,7 +3,7 @@
  * Author: Leo Huang
  * Student ID: 26886294
  * Date created: 29/8/2017
- */
+*/
 
 #include <iostream>
 #include "Game.h"
@@ -16,7 +16,7 @@ int getPlayerCount()
 	int playerCount = 0;
 	while (playerCount < 2 || playerCount > 4)
 	{
-		cout << "How many players would you like? (2 - 4)";
+		cout << "How many players would you like? (2 - 4) ";
 		cin >> playerCount;
 		cin.clear();
 		cin.ignore(numeric_limits<streamsize>::max(), '\n'); //flush the cin buffer

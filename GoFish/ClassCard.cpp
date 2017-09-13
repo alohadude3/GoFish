@@ -3,11 +3,9 @@
  * Author: Leo Huang
  * Student ID: 26886294
  * Date created: 29/8/2017
- */
+*/
 
 #include "ClassCard.h"
-
-using namespace std;
 
 /** Empty constructor */
 ClassCard::ClassCard()
@@ -37,51 +35,25 @@ void ClassCard::setAttributes(int value)
 		case 0:
 		{
 			suit = "Diamonds";
+			break;
 		}
 		case 1:
 		{
 			suit = "Clubs";
+			break;
 		}
 		case 2:
 		{
 			suit = "Hearts";
+			break;
 		}
 		case 3:
 		{
 			suit = "Spades";
+			break;
 		}
 	}
-	int intRank = value / 4;
-	if (intRank < 11 && intRank > 1)
-	{
-		rank = (char)intRank + 48;
-	}
-	else
-	{
-		switch (rank)
-		{
-			case 1:
-			{
-				rank = 'A';
-				break;
-			}
-			case 11:
-			{
-				rank = 'J';
-				break;
-			}
-			case 12:
-			{
-				rank = 'Q';
-				break;
-			}
-			case 13:
-			{
-				rank = 'K';
-				break;
-			}
-		}
-	}
+	rank = value / 4 + 1;
 }
 
 /** Getter for card suit */
@@ -90,8 +62,8 @@ string ClassCard::getSuit()
 	return suit;
 }
 
-/** Getter for card rank */
-char ClassCard::getRank()
+/** Getter for int value card rank */
+int ClassCard::getRank()
 {
 	return rank;
 }

@@ -3,16 +3,16 @@
  * Author: Leo Huang
  * Student ID: 26886294
  * Date created: 12/9/2017
- */
+*/
 
 #ifndef GAME_H
 #define GAME_H
 
-#include <iostream>
 #include <vector>
 #include <string>
-#include <ctime> //std::srand for seeding
 #include "ClassPlayer.h"
+
+using namespace std;
 
 class Game
 {
@@ -24,8 +24,9 @@ class Game
 		void turn();
 		string getPlayerName();
 		int getPlayerToAsk();
-		int getCardRank();
+		char getCardRank();
 		void checkPlayerForSets(ClassPlayer& player);
+		void wait();
 	private:
 		int playerCount;
 		int currentPlayer;

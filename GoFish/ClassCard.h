@@ -10,6 +10,8 @@
 
 #include <string>
 
+using namespace std;
+
 /** Class declaration */
 class ClassCard
 {
@@ -18,13 +20,13 @@ class ClassCard
 		ClassCard(int value);
 		~ClassCard();
 		string getSuit();
-		char getRank();
+		int getRank();
 		void setValue(int value);
 		int getValue();
 	private:
 		int value;
 		string suit;
-		char rank;
+		int rank;
 		void setAttributes(int value);
 };
 
