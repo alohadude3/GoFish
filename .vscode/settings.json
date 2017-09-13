@@ -1,0 +1,12 @@
+{
+	"files.associations": {
+		"*.pde": "java",
+		"algorithm": "cpp",
+		"ctime": "cpp",
+		"iostream": "cpp",
+		"istream": "cpp",
+		"ostream": "cpp",
+		"ios": "cpp",
+		"xlocnum": "cpp"
+	}
+}
