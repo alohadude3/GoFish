@@ -80,14 +80,14 @@ void Game::turn()
 			cout << players.at(i).getName() << " has " << players.at(i).getCardCount() << " cards and " << players.at(i).getPoints() << " points.\n";
 		}
 		cout << "\nYour current hand:\n" << players.at(0).showHand() << "\n\n";
-		if (players.at(currentPlayer).getCardCount() == 4)
+		int playerToAsk, cardValue;
+		cout << players.at(currentPlayer).getName() << "'s turn.\n";
+		wait();
+		if (players.at(currentPlayer).getCardCount() == 0)
 		{
 			turnOngoing = false;
 			break;
 		}
-		int playerToAsk, cardValue;
-		cout << players.at(currentPlayer).getName() << "'s turn.\n";
-		wait();
 		/** Selecting a player to ask and a card rank to ask for */
 		if (currentPlayer == 0) //if it is our turn
 		{
@@ -116,32 +116,38 @@ void Game::turn()
 		{
 			cout << players.at(playerToAsk).getName() << " tells " << players.at(currentPlayer).getName() << " to go fish.\n";
 			wait();
-			ClassCard tempCard = table.getRandomCard();
-			players.at(currentPlayer).addCard(tempCard);
-			if (currentPlayer != 0)
+			if (table.getCardCount() > 0)
 			{
-				cout << players.at(currentPlayer).getName() << " draws a card from the table.\n";
-				wait();
-			}
-			else
-			{
-				cout << "You draw a " << rankToString(tempCard.getRank()) << " of " << tempCard.getSuit() << endl;
-				wait();
-			}
-			if (tempCard.getRank() != cardValue) //if the drawn card isn't what was asked, turn over
-			{
-				turnOngoing = false;
-				cout << endl;
-			}
-			else
-			{
+				ClassCard tempCard = table.getRandomCard();
+				players.at(currentPlayer).addCard(tempCard);
 				if (currentPlayer != 0)
 				{
-					cout << players.at(currentPlayer).getName() << " draws a " << rankToString(tempCard.getRank()) << " of " << tempCard.getSuit() << endl;
+					cout << players.at(currentPlayer).getName() << " draws a card from the table.\n";
 					wait();
 				}
+				else
+				{
+					cout << "You draw a " << rankToString(tempCard.getRank()) << " of " << tempCard.getSuit() << endl;
+					wait();
+				}
+				if (tempCard.getRank() != cardValue) //if the drawn card isn't what was asked, turn over
+				{
+					turnOngoing = false;
+				}
+				else
+				{
+					if (currentPlayer != 0)
+					{
+						cout << players.at(currentPlayer).getName() << " draws a " << rankToString(tempCard.getRank()) << " of " << tempCard.getSuit() << endl;
+						wait();
+					}
+				}
+				checkPlayerForSets(players.at(currentPlayer));
 			}
-			checkPlayerForSets(players.at(currentPlayer));
+			else
+			{
+				turnOngoing = false;
+			}
 		}
 	}
 	currentPlayer += 1;

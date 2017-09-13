@@ -116,6 +116,7 @@ string ClassPlayer::checkSets()
 					setsCompleted += 1;
 					rank = temp.at(0).getRank();
 					temp.clear();
+					break;
 				}
 			}
 			else
@@ -147,7 +148,7 @@ string ClassPlayer::checkSets()
 string ClassPlayer::drawCard(ClassPlayer& table)
 {
 	stringstream output;
-	output << name << " draws ";
+	output << name << "draws ";
 	if (table.getCardCount() >= 7)
 	{
 		for (int i = 0; i < 7; i++)
@@ -187,7 +188,7 @@ string ClassPlayer::showHand()
 /** Comparator for 2 cards */
 bool ClassPlayer::compareCards(ClassCard& card1, ClassCard& card2)
 {
-	return card1.getValue() < card2.getValue();
+	return card1.getRank() < card2.getRank();
 }
 
 /** Sorts the set of cards in ascending order by value*/
