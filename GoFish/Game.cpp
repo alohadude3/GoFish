@@ -318,7 +318,7 @@ void Game::getWinningPlayers(vector<int>& winningPlayers)
 	{
 		if (players.at(i).getPoints() == highestPoint)
 		{
-			winningPlayers.push_back(highestPoint);
+			winningPlayers.push_back(i);
 		}
 	}
 }

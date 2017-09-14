@@ -134,7 +134,6 @@ string ClassPlayer::checkSets()
 					setsCompleted += 1;
 					rank = temp.at(0).getRank();
 					temp.clear();
-					break;
 				}
 			}
 			else
