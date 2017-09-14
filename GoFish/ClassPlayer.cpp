@@ -200,11 +200,18 @@ void ClassPlayer::sortCards()
 /** Randoms a number from 0 to number of players in the game that is not the argument */
 int ClassPlayer::getRandomPlayerToAsk(int selfIndex, int playerCount)
 {
-	int playerToAsk = selfIndex;
-	while (playerToAsk == selfIndex)
+	int playerToAsk;
+	vector<int> indices;
+	for (int i = 0; i < playerCount; i++)
 	{
-		srand(time(NULL));
-		playerToAsk = rand() % playerCount;
+		indices.push_back(i);
+	}
+	srand(time(NULL));
+	random_shuffle(indices.begin(), indices.end());
+	playerToAsk = indices.at(0);
+	if (playerToAsk == selfIndex)
+	{
+		playerToAsk = indices.at(1);
 	}
 	return playerToAsk;
 }
