@@ -68,6 +68,24 @@ void ClassPlayer::addCard(ClassCard card)
 	hand.push_back(card);
 }
 
+/** Adds a card to the sets */
+void ClassPlayer::addSetCard(ClassCard card)
+{
+	sets.push_back(card);
+}
+
+/** Retrieves the value of the card at index i */
+int ClassPlayer::getCardValue(int i)
+{
+	return hand.at(i).getValue();
+}
+
+/** Retrieves the value of the card at index i in sets */
+int ClassPlayer::getSetCardValue(int i)
+{
+	return sets.at(i).getValue();
+}
+
 /** Removes the card from the hand at index i and returns it */
 ClassCard ClassPlayer::getCard(int i)
 {
@@ -148,7 +166,7 @@ string ClassPlayer::checkSets()
 string ClassPlayer::drawCard(ClassPlayer& table)
 {
 	stringstream output;
-	output << name << "draws ";
+	output << name << " draws ";
 	if (table.getCardCount() >= 7)
 	{
 		for (int i = 0; i < 7; i++)
@@ -188,7 +206,7 @@ string ClassPlayer::showHand()
 /** Comparator for 2 cards */
 bool ClassPlayer::compareCards(ClassCard& card1, ClassCard& card2)
 {
-	return card1.getRank() < card2.getRank();
+	return card1.getValue() < card2.getValue();
 }
 
 /** Sorts the set of cards in ascending order by value*/
@@ -235,6 +253,12 @@ string ClassPlayer::getName()
 	return name;
 }
 
+/** Setter for points */
+void ClassPlayer::setPoints(int poitns)
+{
+	this->points = points;
+}
+
 /** Getter for points */
 int ClassPlayer::getPoints()
 {
@@ -245,6 +269,18 @@ int ClassPlayer::getPoints()
 int ClassPlayer::getCardCount()
 {
 	return hand.size();
+}
+
+/** Getter for number of cards in sets */
+int ClassPlayer::getSetCardCount()
+{
+	return sets.size();
+}
+
+/** Setter for number of sets completed */
+void ClassPlayer::setSetsCompleted(int setsCompleted)
+{
+	this->setsCompleted = setsCompleted;
 }
 
 /** Getter for number of sets completed */

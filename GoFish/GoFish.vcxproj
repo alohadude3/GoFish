@@ -24,12 +24,18 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="rankToString.cpp" />
+    <ClCompile Include="XOR.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassCard.h" />
     <ClInclude Include="ClassPlayer.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="rankToString.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="XOR.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GoFish.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{89338535-B50D-4D0B-A474-FE9FEBE0D2F2}</ProjectGuid>

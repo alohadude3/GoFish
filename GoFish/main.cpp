@@ -28,11 +28,47 @@ int getPlayerCount()
 	return playerCount;
 }
 
+/** Retrieves the player's command to whether they want to play a new game or load an existing game */
+char getCommand()
+{
+	char command = ' ';
+	while (command != 'n' && command != 'l')
+	{
+		cout << "Would you like to start a (n)ew game or (l)oad an existing game? ";
+		cin >> command;
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		if (command != 'n' && command != 'l')
+		{
+			cout << "Invalid command. Please try again.\n";
+		}
+	}
+	return command;
+}
+
+/** Main function */
 int main()
 {
+	bool playGame = true;
 	cout << "Welcome to Go Fish.\n";
-	Game game = Game(getPlayerCount());
-	game.play();
-	cin.get();
+	while (playGame)
+	{
+		Game game = Game();
+		char command = getCommand();
+		switch (command)
+		{
+			case 'n':
+			{
+				game.setup(getPlayerCount());
+				break;
+			}
+			case 'l':
+			{
+				game.load();
+				break;
+			}
+		}
+		playGame = game.play();
+	}
 	return 0;
 }

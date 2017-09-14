@@ -30,6 +30,9 @@
     <ClCompile Include="rankToString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="XOR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassCard.h">
@@ -44,5 +47,16 @@
     <ClInclude Include="rankToString.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XOR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GoFish.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

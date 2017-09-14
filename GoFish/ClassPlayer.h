@@ -24,6 +24,9 @@ class ClassPlayer
 		void makeDeck();
 		int have(int rank);
 		void addCard(ClassCard card);
+		void addSetCard(ClassCard card);
+		int getCardValue(int i);
+		int getSetCardValue(int i);
 		ClassCard getCard(int i);
 		ClassCard getRandomCard();
 		string checkSets();
@@ -35,12 +38,14 @@ class ClassPlayer
 		int getRandomCardRank();
 		void setName(string name);
 		string getName();
+		void setPoints(int points);
 		int getPoints();
 		int getCardCount();
+		int getSetCardCount();
+		void setSetsCompleted(int setsCompleted);
 		int getSetsCompleted();
 	private:
 		string name;
-		string type;
 		int points;
 		static int setsCompleted;
 		vector<ClassCard> hand; //the player's current hand of cards

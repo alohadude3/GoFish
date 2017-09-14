@@ -7,11 +7,17 @@
 
 #include <iostream>
 #include <ctime> //std::srand for seeding
+#include <fstream> //ifstream and ofstream
+#include <sstream> //stringstream
 #include "conio.h" //_getch
 #include "Game.h"
 #include "ClassPlayer.h"
 #include "ClassCard.h"
 #include "rankToString.h"
+#include "XOR.h"
+
+string Game::key = "key";
+string Game::hashkey = "hashkey";
 
 /** Empty constructor */
 Game::Game()
@@ -19,8 +25,14 @@ Game::Game()
 
 }
 
-/** Constructor for specifying number of players */
-Game::Game(int playerCount)
+/** Destructor */
+Game::~Game()
+{
+
+}
+
+/** Sets up the game */
+void Game::setup(int playerCount)
 {
 	this->playerCount = playerCount;
 	table = ClassPlayer("Table"); //the table will just be holding whatever cards are in the deck
@@ -46,29 +58,46 @@ Game::Game(int playerCount)
 	}
 }
 
-/** Destructor */
-Game::~Game()
-{
-
-}
-
-
 /** Game loop */
-void Game::play()
+bool Game::play()
 {
 	bool gameOngoing = true;
 	while (gameOngoing)
 	{
-		turn();
+		if (!turn())
+		{
+			return false;
+		}
 		if (table.getSetsCompleted() == 13)
 		{
 			gameOngoing = false;
 		}
 	}
+	system("cls");
+	highestPoint = gethighestPoint();
+	getWinningPlayers(winningPlayers);
+	if (winningPlayers.size() > 1)
+	{
+		cout << "It is a draw between ";
+		for (size_t i = 0; i < winningPlayers.size(); i++)
+		{
+			if (i > 0)
+			{
+				cout << " and ";
+			}
+			cout << players.at(winningPlayers.at(i)).getName();
+		}
+		cout << "!\n";
+	}
+	else
+	{
+		cout << players.at(winningPlayers.at(0)).getName() << " wins with " << highestPoint << " points!\n";
+	}
+	return getTryAgain();
 }
 
 /** Turn loop */
-void Game::turn()
+bool Game::turn()
 {
 	bool turnOngoing = true;
 	while (turnOngoing)
@@ -82,7 +111,6 @@ void Game::turn()
 		cout << "\nYour current hand:\n" << players.at(0).showHand() << "\n\n";
 		int playerToAsk, cardValue;
 		cout << players.at(currentPlayer).getName() << "'s turn.\n";
-		wait();
 		if (players.at(currentPlayer).getCardCount() == 0)
 		{
 			turnOngoing = false;
@@ -152,8 +180,16 @@ void Game::turn()
 	}
 	currentPlayer += 1;
 	currentPlayer %= playerCount;
-	cout << "End of turn";
-	wait();
+	char command = getEndTurnCommand();
+	if (command == 's')
+	{
+		save();
+		return false;
+	}
+	else
+	{
+		return true;
+	}
 }
 
 /** Retrieves and returns the name of the player */
@@ -259,4 +295,205 @@ void Game::wait()
 	{
 		//do nothing
 	}
+}
+
+/** Returns the highest point between all the players */
+int Game::gethighestPoint()
+{
+	int max = 0;
+	for (size_t i = 0; i < players.size(); i++)
+	{
+		if (max < players.at(i).getPoints())
+		{
+			max = players.at(i).getPoints();
+		}
+	}
+	return max;
+}
+
+/** Adds the indices of all the players who have the highest points */
+void Game::getWinningPlayers(vector<int>& winningPlayers)
+{
+	for (size_t i = 0; i < players.size(); i++)
+	{
+		if (players.at(i).getPoints() == highestPoint)
+		{
+			winningPlayers.push_back(highestPoint);
+		}
+	}
+}
+
+/**
+ * Asks the player if they want to try again
+ * Returns true if player says yes
+ * Returns false otherwise
+*/
+bool Game::getTryAgain()
+{
+	char response = ' ';
+	while (response != 'y' && response != 'n')
+	{
+		cout << "Would you like to play again? (y/n) ";
+		cin >> response;
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		if (response != 'y' && response != 'n')
+		{
+			cout << "Invalid command. Please try again.\n";
+		}
+	}
+	return (response == 'y');
+}
+
+/**
+ * Saves the game state to the file data.save
+ * Returns 0 if successful, 1 otherwise
+*/
+ int Game::save()
+ {
+	 ofstream theFile;
+	 theFile.open("data.save");
+	 if (theFile.good())
+	 {
+		stringstream outputstream;
+		/** Game variables */
+		outputstream << playerCount << ' ';
+		outputstream << currentPlayer << ' ';
+		/** table variables */
+		outputstream << table.getName() << ' ';
+		outputstream << table.getSetsCompleted()  << ' ';
+		int tableCardCount = table.getCardCount();
+		outputstream << tableCardCount << ' ';
+		/** table cards */
+		for (int i = 0; i < tableCardCount; i++)
+		{
+			outputstream << table.getCardValue(i) << ' ';
+		}
+		/** Player variables */
+		for (int i = 0; i < playerCount; i++)
+		{
+			outputstream << players.at(i).getName() << ' ';
+			outputstream << players.at(i).getPoints() << ' ';
+			int playerCardCount = players.at(i).getCardCount();
+			outputstream << playerCardCount << ' ';
+			/** Player hand cards */
+			for (int j = 0; j < playerCardCount; j++)
+			{
+				outputstream << players.at(i).getCardValue(j) << ' ';
+			}
+			int playerSetCardCount = players.at(i).getSetCardCount();
+			outputstream << playerSetCardCount << ' ';
+			/** Player set cards */
+			for (int j = 0; j < playerSetCardCount; j++)
+			{
+				outputstream << players.at(i).getSetCardValue(j) << ' ';
+			}
+		}
+		string output = outputstream.str();
+		output = XOR(output, hashkey); //make hash digest
+		outputstream << endl << output; //append to new line
+		output = outputstream.str();
+		output = XOR(output, key); //encrypt data + digest
+		theFile << output;
+		theFile.close();
+		return 0;
+	 }
+	 theFile.close();
+	 return 1;
+ }
+ 
+/**
+  * Loads the game state from the file data.save
+  * Returns 0 if successful, 1 if the file cannot be accessed, 2 if the save file is corrupted
+*/
+ int Game::load()
+ {
+	 string tempString;
+	 int tempInt;
+	 ifstream theFile;
+	 theFile.open("data.save");
+	 if (theFile.good())
+	 {
+		string input((istreambuf_iterator<char>(theFile)), istreambuf_iterator<char>());
+		input = XOR(input, key);
+		stringstream inputstream(input);
+		string data, hashdigest;
+		getline(inputstream, data);
+		getline(inputstream, hashdigest);
+		if (hashdigest.compare(XOR(data, hashkey)) == 0)
+		{
+			stringstream datastream(data);
+			/** Game variables */
+			datastream >> playerCount;
+			datastream >> currentPlayer;
+			/** table variables */
+			datastream >> tempString;
+			table.setName(tempString);
+			datastream >> tempInt;
+			table.setSetsCompleted(tempInt);
+			/** table cards */
+			datastream >> tempInt;
+			for (int i = 0; i < tempInt; i++)
+			{
+				int cardValue;
+				datastream >> cardValue;
+				ClassCard tempCard = ClassCard(cardValue);
+				table.addCard(tempCard);
+			}
+			/** Player variables */
+			for (int i = 0; i < playerCount; i++)
+			{
+				datastream >> tempString;
+				ClassPlayer tempPlayer = ClassPlayer(tempString);
+				datastream >> tempInt;
+				tempPlayer.setPoints(tempInt);
+				datastream >> tempInt;
+				/** player cards */
+				for (int j = 0; j < tempInt; j++)
+				{
+					int cardValue;
+					datastream >> cardValue;
+					ClassCard tempCard = ClassCard(cardValue);
+					tempPlayer.addCard(tempCard);
+				}
+				datastream >> tempInt;
+				/** player set cards */
+				for (int j = 0; j < tempInt; j++)
+				{
+					int cardValue;
+					datastream >> cardValue;
+					ClassCard tempCard = ClassCard(cardValue);
+					tempPlayer.addSetCard(tempCard);
+				}
+				players.push_back(tempPlayer);
+			}
+			theFile.close();
+			return 0;
+		}
+		else
+		{
+			theFile.close();
+			return 2;
+		}
+	 }
+	 theFile.close();
+	 return 1;
+ }
+
+/** Retrieves and returns a char representing the command of whether the player wants to continue or save and quit the game */
+char Game::getEndTurnCommand()
+{
+	char command = ' ';
+	while (command != 'c' && command != 's')
+	{
+		cout << "End of turn. Would you like to (c)ontinue or (s)ave and quit the game? ";
+		cin >> command;
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		if (command != 'c' && command != 's')
+		{
+			cout << "Invalid command. Please try again.\n";
+		}
+	}
+	return command;
 }
