@@ -87,7 +87,7 @@ bool Game::play()
 			}
 			cout << players.at(winningPlayers.at(i)).getName();
 		}
-		cout << "!\n";
+		cout << " at " << highestPoint << " points each!\n";
 	}
 	else
 	{
