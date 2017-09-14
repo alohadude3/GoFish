@@ -253,7 +253,7 @@ string ClassPlayer::getName()
 }
 
 /** Setter for points */
-void ClassPlayer::setPoints(int poitns)
+void ClassPlayer::setPoints(int points)
 {
 	this->points = points;
 }
