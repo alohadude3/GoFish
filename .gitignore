@@ -330,3 +330,6 @@ __pycache__/
 *.exe
 *.out
 *.app
+
+# Save file
+*.save
