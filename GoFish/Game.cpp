@@ -183,8 +183,11 @@ bool Game::turn()
 	char command = getEndTurnCommand();
 	if (command == 's')
 	{
-		save();
-		return false;
+		if (save() == 0)
+		{
+			return false;
+		}
+		cout << "Cannot write to save file.\n";
 	}
 	else
 	{

@@ -60,15 +60,33 @@ int main()
 			case 'n':
 			{
 				game.setup(getPlayerCount());
+				playGame = game.play();
 				break;
 			}
 			case 'l':
 			{
-				game.load();
+				int status = game.load();
+				switch (status)
+				{
+					case 0:
+					{
+						playGame = game.play();
+						break;
+					}
+					case 1:
+					{
+						cout << "Error accessing save file.\n";
+						break;
+					}
+					case 2:
+					{
+						cout << "Save file is corrupted.\n";
+						break;
+					}
+				}
 				break;
 			}
 		}
-		playGame = game.play();
 	}
 	return 0;
 }
